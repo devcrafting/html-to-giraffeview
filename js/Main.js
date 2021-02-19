@@ -5830,11 +5830,11 @@ var $author$project$HtmlToElm$HtmlToElm$indentTreeStrings = F2(
 		return A2(indentTreeStrings_, 0, originalTree);
 	});
 var $elm$core$Debug$todo = _Debug_todo;
-var $author$project$HtmlToElm$HtmlToElm$formatHaskellMultilineList = function (indentTrees) {
+var $author$project$HtmlToElm$HtmlToElm$formatFsharpMultilineList = function (indentTrees) {
 	var transformTailLine = function (indentTree_) {
 		if (indentTree_.$ === 'IndentTreeLeaf') {
 			var s = indentTree_.a;
-			return $author$project$HtmlToElm$HtmlToElm$IndentTreeLeaf(', ' + s);
+			return $author$project$HtmlToElm$HtmlToElm$IndentTreeLeaf('  ' + s);
 		} else {
 			if (indentTree_.a.b) {
 				var _v1 = indentTree_.a;
@@ -5964,7 +5964,7 @@ var $author$project$HtmlToElm$HtmlToElm$renderAttribute = function (_v0) {
 var $author$project$HtmlToElm$HtmlToElm$renderAttributes = function (attributes) {
 	var attributesList = $elm$core$Dict$toList(attributes);
 	var attributeListString = A2($elm$core$List$map, $author$project$HtmlToElm$HtmlToElm$renderAttribute, attributesList);
-	var innards = A2($elm$core$String$join, '  ', attributeListString);
+	var innards = A2($elm$core$String$join, '; ', attributeListString);
 	if (innards === '') {
 		return '[]';
 	} else {
@@ -6044,7 +6044,7 @@ var $author$project$HtmlToElm$HtmlToElm$renderVerticalChild = function (node) {
 						$author$project$HtmlToElm$HtmlToElm$IndentTreeLeaf('[]')
 					]);
 			} else {
-				return $author$project$HtmlToElm$HtmlToElm$formatHaskellMultilineList(
+				return $author$project$HtmlToElm$HtmlToElm$formatFsharpMultilineList(
 					A2($elm$core$List$map, $author$project$HtmlToElm$HtmlToElm$renderNode, children));
 			}
 		}();

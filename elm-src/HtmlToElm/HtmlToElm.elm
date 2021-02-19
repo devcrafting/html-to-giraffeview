@@ -65,7 +65,7 @@ renderAttributes attributes =
     let
         attributesList = Dict.toList attributes
         attributeListString = List.map renderAttribute attributesList
-        innards = String.join "  " attributeListString
+        innards = String.join "; " attributeListString
     in
         case innards of
             "" -> "[]"
@@ -111,7 +111,7 @@ renderVerticalChild node =
                 childrenLines =
                     case children of
                         [] -> [IndentTreeLeaf "[]"]
-                        _ -> formatHaskellMultilineList (List.map renderNode children)
+                        _ -> formatFsharpMultilineList (List.map renderNode children)
 
             in
                 IndentTrees
@@ -177,8 +177,8 @@ escapeDoubleQuotes : String -> String
 escapeDoubleQuotes s =
     Regex.replace (Regex.fromString "\"" |> Maybe.withDefault Regex.never) (\_ -> "\\\"") s
 
-formatHaskellMultilineList : List IndentTree -> List IndentTree
-formatHaskellMultilineList indentTrees =
+formatFsharpMultilineList : List IndentTree -> List IndentTree
+formatFsharpMultilineList indentTrees =
     -- 1. prepend "[ " to first item
     -- 2. prepend ", " to tail items
     -- 3 append a line with "]"
@@ -197,7 +197,7 @@ formatHaskellMultilineList indentTrees =
         transformTailLine indentTree_ =
             case indentTree_ of
                 IndentTreeLeaf s ->
-                    IndentTreeLeaf <| ", " ++ s
+                    IndentTreeLeaf <| "  " ++ s
                 IndentTrees (headTree::tailTrees) ->
                     IndentTrees <| [transformTailLine headTree] ++ tailTrees
                 IndentTrees [] ->
