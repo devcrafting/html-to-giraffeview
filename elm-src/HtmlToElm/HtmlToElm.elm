@@ -6,9 +6,8 @@ module HtmlToElm.HtmlToElm exposing (..)
 --------------------------------------------------------------------------------
 import Dict exposing (Dict)
 import String
-import Legacy.ElmTest exposing (..)
 import Maybe exposing (Maybe)
-import Regex exposing (regex)
+import Regex
 
 
 --------------------------------------------------------------------------------
@@ -17,7 +16,7 @@ import Regex exposing (regex)
 
 import HtmlParser.HtmlParser exposing
     ( parseHtml
-    , Node(Element, Text)
+    , Node(..)
     )
 import HtmlToElm.ElmHtmlWhitelists exposing (..)
 
@@ -41,12 +40,12 @@ renderAttribute (key, value) =
         List.member key implementedAttributeFunctions
 
     then
-        key ++ " " ++ "\"" ++ value ++ "\""
+        "_" ++ key ++ " " ++ "\"" ++ value ++ "\""
     else
         if
             List.member key reservedWords
         then
-            key ++ "_ " ++ "\"" ++ value ++ "\""
+            "_" ++ key ++ "_ " ++ "\"" ++ value ++ "\""
         else
             "attribute \"" ++ key ++ "\""  ++ " \"" ++ value ++ "\""
 -- TODO: look this app in the attributes whitelist
@@ -66,7 +65,7 @@ renderAttributes attributes =
     let
         attributesList = Dict.toList attributes
         attributeListString = List.map renderAttribute attributesList
-        innards = String.join ", " attributeListString
+        innards = String.join "  " attributeListString
     in
         case innards of
             "" -> "[]"
@@ -83,9 +82,9 @@ renderTextNode node =
                 text_ = text |> removeNewlines |> escapeDoubleQuotes
 
             in
-                "text \"" ++ text_ ++ "\""
+                "str \"" ++ text_ ++ "\""
         _ ->
-            Debug.crash("")
+            Debug.todo("")
 
 
 renderTagFunctionHead : String -> String
@@ -152,8 +151,8 @@ flattenIndentTree : IndentTree -> List String
 flattenIndentTree indentTree =
     let
         flattenIndentTree_ : IndentTree -> List String   ->   List String
-        flattenIndentTree_ indentTree acc =
-            (flattenIndentTree indentTree) ++ acc
+        flattenIndentTree_ indentTree_ acc =
+            (flattenIndentTree indentTree_) ++ acc
     in
         case indentTree of
             IndentTreeLeaf s -> [s]
@@ -171,12 +170,12 @@ htmlNodeToElm spacesPerIndent node =
 
 removeNewlines : String -> String
 removeNewlines s =
-    Regex.replace Regex.All (regex "\n") (\_ -> "") s
+    Regex.replace (Regex.fromString "\n" |> Maybe.withDefault Regex.never) (\_ -> "") s
 
 
 escapeDoubleQuotes : String -> String
 escapeDoubleQuotes s =
-    Regex.replace Regex.All (regex "\"") (\_ -> "\\\"") s
+    Regex.replace (Regex.fromString "\"" |> Maybe.withDefault Regex.never) (\_ -> "\\\"") s
 
 formatHaskellMultilineList : List IndentTree -> List IndentTree
 formatHaskellMultilineList indentTrees =
@@ -192,7 +191,7 @@ formatHaskellMultilineList indentTrees =
                 IndentTrees (headTree::tailTrees) ->
                     IndentTrees <| [transformHeadLine headTree] ++ tailTrees
                 IndentTrees [] ->
-                    Debug.crash("")
+                    Debug.todo("")
 
         transformTailLine : IndentTree -> IndentTree
         transformTailLine indentTree_ =
@@ -202,7 +201,7 @@ formatHaskellMultilineList indentTrees =
                 IndentTrees (headTree::tailTrees) ->
                     IndentTrees <| [transformTailLine headTree] ++ tailTrees
                 IndentTrees [] ->
-                    Debug.crash("")
+                    Debug.todo("")
     in
         case indentTrees of
             headTree::[] ->
@@ -242,92 +241,92 @@ htmlToElm spacesPerIndent s =
 --------------------------------------------------------------------------------
 
 
-testAttributes = Dict.fromList [("id", "1"), ("class", "success")]
-testLeafElement = Element
-    {
-        tagName = "div",
-        attributes = testAttributes,
-        children = []
-    }
+-- testAttributes = Dict.fromList [("id", "1"), ("class", "success")]
+-- testLeafElement = Element
+--     {
+--         tagName = "div",
+--         attributes = testAttributes,
+--         children = []
+--     }
 
-testLeafElement2 = Element
-    {
-        tagName = "div",
-        attributes = testAttributes,
-        children = [Text "hello"]
-    }
+-- testLeafElement2 = Element
+--     {
+--         tagName = "div",
+--         attributes = testAttributes,
+--         children = [Text "hello"]
+--     }
 
-testLeafElements = List.repeat 3 testLeafElement
+-- testLeafElements = List.repeat 3 testLeafElement
 
-testIndentTree =
-    IndentTrees [
-        IndentTreeLeaf "a",
-        IndentTrees
-            [
-                IndentTreeLeaf "b"
-            ]
-    ]
+-- testIndentTree =
+--     IndentTrees [
+--         IndentTreeLeaf "a",
+--         IndentTrees
+--             [
+--                 IndentTreeLeaf "b"
+--             ]
+--     ]
 
-tests = suite "HtmlToElm.elm"
-    [
-        test "renderAttribute" (
-            assertEqual
-                "class \"success\""
-                (renderAttribute ("class", "success"))
-        )
-        ,
-        test "renderAttributes" (
-            assertEqual
-                "[ class \"success\", id \"1\" ]"
-                (renderAttributes <| Dict.fromList [("id", "1"), ("class", "success")])
-        )
-        ,
-        test "renderAttributes" (
-            assertEqual
-                "[]"
-                (renderAttributes <| Dict.fromList [])
-        )
-        ,
-        test "renderTextNode" (
-            assertEqual
-                "text \"hello\""
-                (renderTextNode <| Text "hello")
-        )
-        ,
-        test "indent" (
-            assertEqual
-                "        hello"
-                (indent 4 2 "hello")
-        )
-        ,
-        test "indentTree" (
-            assertEqual
-                (IndentTrees [IndentTreeLeaf "a", IndentTreeLeaf "b"])
-                (IndentTrees [IndentTreeLeaf "a", IndentTreeLeaf "b"])
-        )
-        ,
-        test "flattenIndentTree" (
-            assertEqual
-                ["a", "b"]
-                (flattenIndentTree testIndentTree)
-        )
-        ,
-        test "formatHaskellMultilineList" (
-            assertEqual
-                [IndentTreeLeaf "[ X", IndentTreeLeaf ", X", IndentTreeLeaf "]"]
-                (formatHaskellMultilineList [IndentTreeLeaf "X", IndentTreeLeaf "X"])
-        )
-        ,
-        test "just text" (
-            assertEqual
-                (IndentTreeLeaf "x")
-                (
-                    case parseHtml "hello" of
-                        Just node -> renderNode node
-                        Nothing -> IndentTreeLeaf "x"
-                )
-        )
-    ]
+-- tests = suite "HtmlToElm.elm"
+--     [
+--         test "renderAttribute" (
+--             assertEqual
+--                 "class \"success\""
+--                 (renderAttribute ("class", "success"))
+--         )
+--         ,
+--         test "renderAttributes" (
+--             assertEqual
+--                 "[ class \"success\", id \"1\" ]"
+--                 (renderAttributes <| Dict.fromList [("id", "1"), ("class", "success")])
+--         )
+--         ,
+--         test "renderAttributes" (
+--             assertEqual
+--                 "[]"
+--                 (renderAttributes <| Dict.fromList [])
+--         )
+--         ,
+--         test "renderTextNode" (
+--             assertEqual
+--                 "text \"hello\""
+--                 (renderTextNode <| Text "hello")
+--         )
+--         ,
+--         test "indent" (
+--             assertEqual
+--                 "        hello"
+--                 (indent 4 2 "hello")
+--         )
+--         ,
+--         test "indentTree" (
+--             assertEqual
+--                 (IndentTrees [IndentTreeLeaf "a", IndentTreeLeaf "b"])
+--                 (IndentTrees [IndentTreeLeaf "a", IndentTreeLeaf "b"])
+--         )
+--         ,
+--         test "flattenIndentTree" (
+--             assertEqual
+--                 ["a", "b"]
+--                 (flattenIndentTree testIndentTree)
+--         )
+--         ,
+--         test "formatHaskellMultilineList" (
+--             assertEqual
+--                 [IndentTreeLeaf "[ X", IndentTreeLeaf ", X", IndentTreeLeaf "]"]
+--                 (formatHaskellMultilineList [IndentTreeLeaf "X", IndentTreeLeaf "X"])
+--         )
+--         ,
+--         test "just text" (
+--             assertEqual
+--                 (IndentTreeLeaf "x")
+--                 (
+--                     case parseHtml "hello" of
+--                         Just node -> renderNode node
+--                         Nothing -> IndentTreeLeaf "x"
+--                 )
+--         )
+--     ]
 
-main =
-    runSuiteHtml tests
+-- main =
+--     runSuiteHtml tests

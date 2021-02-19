@@ -1,17 +1,21 @@
 module HtmlToElmWebsite.Layout exposing (..)
 
 -- import Window
-import Html exposing (Html)
+import Html
+import Html.Attributes exposing (style)
 
 topBarHeight = 50
 panelHeaderHeight = 30
 
-topBar =
-    [ ("height", (toString topBarHeight) ++ "px")
-    , ("line-height", (toString topBarHeight) ++ "px")
-    , ("padding-left", (toString 12) ++ "px")
-    , ("font-size", (toString 20) ++ "px")
-    , ("color", "#293c4b")
+topBar otherStyles =
+    List.concat [
+        otherStyles,
+        [ style "height" ((String.fromInt topBarHeight) ++ "px")
+        , style "line-height" ((String.fromInt topBarHeight) ++ "px")
+        , style "padding-left" ((String.fromInt 12) ++ "px")
+        , style "font-size" ((String.fromInt 20) ++ "px")
+        , style "color" "#293c4b"
+        ]
     ]
 
 topBarRight =
@@ -23,25 +27,25 @@ mainPanel windowSize =
         width = windowSize.width // 2
         height = windowSize.height - topBarHeight
     in
-        [ ("width", (toString width) ++ "px")
-        , ("height", (toString height) ++ "px")
-        , ("position", "absolute")
-        , ("display", "fixed")
+        [ style "width" ((String.fromInt width) ++ "px")
+        , style "height" ((String.fromInt height) ++ "px")
+        , style "position" "absolute"
+        , style "display" "fixed"
         ]
 
-panelHeader =
-    [("height", (toString panelHeaderHeight) ++ "px")]
+panelHeader otherAttributes =
+    [style "height" ((String.fromInt panelHeaderHeight) ++ "px")] ++ otherAttributes
 
-panelContent windowSize =
+panelContent windowSize otherAttributes =
     let
         height = windowSize.height - (topBarHeight + (panelHeaderHeight * 2) )
     in
-        [("height", (toString height) ++ "px")]
+        [style "height" ((String.fromInt height) ++ "px")] ++ otherAttributes
 
 
 -- leftPanel : Window.Size -> List (Html msg)
-leftPanel windowSize =
-    mainPanel windowSize ++ [("left", "0px")]
+leftPanel windowSize otherAttributes =
+    mainPanel windowSize ++ [style "left" "0px"] ++ otherAttributes
 -- rightPanel : Window.Size -> List (Html msg)
-rightPanel windowSize =
-    mainPanel windowSize ++ [("right", "0px")]
+rightPanel windowSize otherAttributes =
+    mainPanel windowSize ++ [style "right" "0px"] ++ otherAttributes

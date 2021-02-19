@@ -6,14 +6,14 @@ module Parser.Parser exposing
     , createOptionallyParseMultipleFunction
     , createParseAtLeastOneFunction
     , createParseAnyFunction
-    , ParseResult(ParseMatchesReturnsResult, ParseMatchesReturnsNothing, ParseDoesNotMatch)
-    , AstNode(LabelledAstNode, UnlabelledAstNode)
-    , AstNodeValue(AstLeaf, AstChildren)
+    , ParseResult(..)
+    , AstNode(..)
+    , AstNodeValue(..)
     , labelled
     , optional
     , ignore
     -- , main
-    , tests
+    -- , tests
     )
 
 
@@ -21,7 +21,7 @@ module Parser.Parser exposing
 -- EXTERNAL DEPENDENCIES
 --------------------------------------------------------------------------------
 
-import Legacy.ElmTest exposing (..)
+-- import Legacy.ElmTest exposing (..)
 
 
 --------------------------------------------------------------------------------
@@ -161,8 +161,8 @@ createParseAnyFunction parseFunctions =
         parseAny_ tokens = parseAny parseFunctions tokens
 
         parseAny    :   ParseFunctions -> Tokens   ->   (ParseResult, RemainderTokens)
-        parseAny parseFunctions tokens =
-            case parseFunctions of
+        parseAny parseFunctions_ tokens =
+            case parseFunctions_ of
                 [] -> (ParseDoesNotMatch, tokens)
                 parseFunction::remainderParseFunctions ->
                     case (parseFunction tokens) of
@@ -268,16 +268,16 @@ createParseAtLeastOneFunction parseFunction =
                                         AstChildren children ->
                                             children
                                         _ ->
-                                            Debug.crash("")
+                                            Debug.todo ("")
 
                                 _ ->
-                                    Debug.crash("")
+                                    Debug.todo ""
                         split_ children =
                             case children of
                                 a::b::_ ->
                                     (a,b)
                                 _ ->
-                                    Debug.crash("")
+                                    Debug.todo ("")
                         (headNode, tailMess) = split_ (getChildren messyNode)
                         tailNodes = getChildren tailMess
                         allNodes = [headNode] ++ tailNodes
@@ -292,268 +292,268 @@ createParseAtLeastOneFunction parseFunction =
 -- TESTS
 --------------------------------------------------------------------------------
 
-testTokens = [(LeftAngleBracket, "<")]
+-- testTokens = [(LeftAngleBracket, "<")]
 
-parseLeftAngleBracketKeep = createParseTokenKeepFunction LeftAngleBracket
-parseLeftAngleBracket = createParseTokenIgnoreFunction LeftAngleBracket
-parseRightAngleBracket = createParseTokenIgnoreFunction RightAngleBracket
-parseRightAngleBracketKeep = createParseTokenIgnoreFunction RightAngleBracket
-parseWordKeep = createParseTokenKeepFunction Word
+-- parseLeftAngleBracketKeep = createParseTokenKeepFunction LeftAngleBracket
+-- parseLeftAngleBracket = createParseTokenIgnoreFunction LeftAngleBracket
+-- parseRightAngleBracket = createParseTokenIgnoreFunction RightAngleBracket
+-- parseRightAngleBracketKeep = createParseTokenIgnoreFunction RightAngleBracket
+-- parseWordKeep = createParseTokenKeepFunction Word
 
-tests = suite "Parser.elm"
-    [
-        test "consumeToken with match" (
-            assertEqual
-                (consumeToken LeftAngleBracket testTokens)
-                (TokenMatches ("<", []))
-        )
-        ,
-        test "consumeToken with match" (
-            assertEqual
-                (consumeToken LeftAngleBracket testTokens)
-                (TokenMatches ("<", []))
-        )
-        ,
-        test "consumeToken no match" (
-            assertEqual
-                (consumeToken RightAngleBracket testTokens)
-                (TokenDoesNotMatch testTokens)
-        )
-        ,
-        test "createParseTokenIgnoreFunction" (
-            assertEqual
-                (ParseMatchesReturnsNothing, [])
-                (
-                    createParseTokenIgnoreFunction LeftAngleBracket
-                    <| tokenize "<"
-                )
-        )
-        ,
-        test "createParseTokenKeepFunction" (
-            assertEqual
-                (
-                    (ParseMatchesReturnsResult <| UnlabelledAstNode <| AstLeaf "<")
-                    ,
-                    []
-                )
-                (
-                    createParseTokenKeepFunction LeftAngleBracket
-                    <| tokenize "<"
-                )
-        )
-        ,
-        test "createParseTokenKeepFunction" (
-            assertEqual
-                (
-                    (ParseMatchesReturnsResult <| LabelledAstNode { label = "LEFT_ANGLE_BRACKET", value = AstLeaf "<" })
-                    ,
-                    []
-                )
-                (
-                    let
-                        parseBracket = labelled "LEFT_ANGLE_BRACKET" <| createParseTokenKeepFunction LeftAngleBracket
-                    in
-                        parseBracket <| tokenize "<"
-                )
-        )
-        ,
-        test "parseLeftAngleBracket" (
-            assertEqual
-                (ParseMatchesReturnsNothing, [])
-                (parseLeftAngleBracket testTokens)
-        )
-        ,
-        test "parseWordKeep" (
-            assertEqual
-                (ParseMatchesReturnsResult (UnlabelledAstNode (AstLeaf "h1")) , [])
-                (parseWordKeep  <| tokenize("h1"))
-        )
+-- tests = suite "Parser.elm"
+--     [
+--         test "consumeToken with match" (
+--             assertEqual
+--                 (consumeToken LeftAngleBracket testTokens)
+--                 (TokenMatches ("<", []))
+--         )
+--         ,
+--         test "consumeToken with match" (
+--             assertEqual
+--                 (consumeToken LeftAngleBracket testTokens)
+--                 (TokenMatches ("<", []))
+--         )
+--         ,
+--         test "consumeToken no match" (
+--             assertEqual
+--                 (consumeToken RightAngleBracket testTokens)
+--                 (TokenDoesNotMatch testTokens)
+--         )
+--         ,
+--         test "createParseTokenIgnoreFunction" (
+--             assertEqual
+--                 (ParseMatchesReturnsNothing, [])
+--                 (
+--                     createParseTokenIgnoreFunction LeftAngleBracket
+--                     <| tokenize "<"
+--                 )
+--         )
+--         ,
+--         test "createParseTokenKeepFunction" (
+--             assertEqual
+--                 (
+--                     (ParseMatchesReturnsResult <| UnlabelledAstNode <| AstLeaf "<")
+--                     ,
+--                     []
+--                 )
+--                 (
+--                     createParseTokenKeepFunction LeftAngleBracket
+--                     <| tokenize "<"
+--                 )
+--         )
+--         ,
+--         test "createParseTokenKeepFunction" (
+--             assertEqual
+--                 (
+--                     (ParseMatchesReturnsResult <| LabelledAstNode { label = "LEFT_ANGLE_BRACKET", value = AstLeaf "<" })
+--                     ,
+--                     []
+--                 )
+--                 (
+--                     let
+--                         parseBracket = labelled "LEFT_ANGLE_BRACKET" <| createParseTokenKeepFunction LeftAngleBracket
+--                     in
+--                         parseBracket <| tokenize "<"
+--                 )
+--         )
+--         ,
+--         test "parseLeftAngleBracket" (
+--             assertEqual
+--                 (ParseMatchesReturnsNothing, [])
+--                 (parseLeftAngleBracket testTokens)
+--         )
+--         ,
+--         test "parseWordKeep" (
+--             assertEqual
+--                 (ParseMatchesReturnsResult (UnlabelledAstNode (AstLeaf "h1")) , [])
+--                 (parseWordKeep  <| tokenize("h1"))
+--         )
 
-        ,
-        (suite "optionallyParseMultiple"
-            (
-                let
-                    optionallyParseMultipleLeftBrackets =
-                        createOptionallyParseMultipleFunction parseLeftAngleBracketKeep
-                in
-                    [
-                        test "optionallyParseMultiple" (
-                            assertEqual
-                                (ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([
-                                        UnlabelledAstNode (AstLeaf "<"),
-                                        UnlabelledAstNode (AstLeaf "<")
-                                    ]))),[])
-                                (optionallyParseMultipleLeftBrackets [(LeftAngleBracket, "<"),(LeftAngleBracket, "<")])
-                        )
-                        ,
-                        test "optionallyParseMultiple" (
-                            assertEqual
+--         ,
+--         (suite "optionallyParseMultiple"
+--             (
+--                 let
+--                     optionallyParseMultipleLeftBrackets =
+--                         createOptionallyParseMultipleFunction parseLeftAngleBracketKeep
+--                 in
+--                     [
+--                         test "optionallyParseMultiple" (
+--                             assertEqual
+--                                 (ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([
+--                                         UnlabelledAstNode (AstLeaf "<"),
+--                                         UnlabelledAstNode (AstLeaf "<")
+--                                     ]))),[])
+--                                 (optionallyParseMultipleLeftBrackets [(LeftAngleBracket, "<"),(LeftAngleBracket, "<")])
+--                         )
+--                         ,
+--                         test "optionallyParseMultiple" (
+--                             assertEqual
 
-                                (
-                                    ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([UnlabelledAstNode (AstLeaf "<")])))
-                                    ,
-                                    [(Word,"hello")]
-                                )
-                                (optionallyParseMultipleLeftBrackets [(LeftAngleBracket, "<"),(Word, "hello")])
-                        )
-                        ,
-                        test "optionallyParseMultiple" (
-                            assertEqual
-                                (ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren [])), [(Word,"hello")])
-                                (optionallyParseMultipleLeftBrackets <| tokenize("hello"))
-                        )
-                    ]
-            )
+--                                 (
+--                                     ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([UnlabelledAstNode (AstLeaf "<")])))
+--                                     ,
+--                                     [(Word,"hello")]
+--                                 )
+--                                 (optionallyParseMultipleLeftBrackets [(LeftAngleBracket, "<"),(Word, "hello")])
+--                         )
+--                         ,
+--                         test "optionallyParseMultiple" (
+--                             assertEqual
+--                                 (ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren [])), [(Word,"hello")])
+--                                 (optionallyParseMultipleLeftBrackets <| tokenize("hello"))
+--                         )
+--                     ]
+--             )
 
-        )
-        ,
-        (suite "parseAny"
-            (
-                let
-                    parseLeftOrRightBracket =
-                        (
-                            createParseAnyFunction
-                            [
-                                parseLeftAngleBracket,
-                                parseRightAngleBracket
-                            ]
-                        )
-                in
-                    [
-                        test "parseAny left" (
-                            assertEqual
-                                (ParseMatchesReturnsNothing, [])
-                                (parseLeftOrRightBracket (tokenize "<"))
-                        )
-                        ,
-                        test "parseAny right" (
-                            assertEqual
-                                (ParseMatchesReturnsNothing, [])
-                                (parseLeftOrRightBracket (tokenize ">"))
-                        )
-                        ,
-                        test "parseAny none" (
-                            assertEqual
-                                (ParseDoesNotMatch, [(Word, "!")])
-                                (parseLeftOrRightBracket (tokenize "!"))
-                        )
-                    ]
-            )
-        )
-        ,
-        (suite "parseSequence"
-            (
-                let
-                    parseSimpleTag =
-                        (
-                            createParseSequenceFunction
-                            [
-                                parseLeftAngleBracket,
-                                parseWordKeep,
-                                parseRightAngleBracket
-                            ]
-                        )
-                in
-                    [
-                        test "parseSequence" (
-                            assertEqual
-                                (
-                                    (ParseMatchesReturnsResult
-                                        <| UnlabelledAstNode
-                                        <| AstChildren [UnlabelledAstNode (AstLeaf "h1")]
-                                    ),
-                                    []
-                                )
-                                (parseSimpleTag (tokenize "<h1>"))
-                        )
-                        ,
-                        test "parseSequence" (
-                            assertEqual
-                                (ParseDoesNotMatch,[(LeftAngleBracket,"<"), (RightAngleBracket,">")])
-                                (parseSimpleTag (tokenize "<>"))
-                        )
-                        ,
-                        test "parseSequence" (
-                            let
-                                optionalMiddle =
-                                    (
-                                        createParseSequenceFunction
-                                        [
-                                            parseLeftAngleBracket,
-                                            optional parseWordKeep,
-                                            parseRightAngleBracket
-                                        ]
-                                    )
-                            in
-                                assertEqual
-                                    (
-                                        (ParseMatchesReturnsResult
-                                            <| UnlabelledAstNode
-                                            <| AstChildren []
-                                        ),
-                                        []
-                                    )
-                                    (optionalMiddle (tokenize "<>"))
-                        )
-                    ]
-            )
-        )
-        ,
-        (suite "parseAtLeastOne"
-            (
-                let
-                    parseLeftOrRightBracket = createParseAnyFunction
-                        [parseLeftAngleBracketKeep, parseRightAngleBracketKeep]
-                    parseAtLeastOneLeftOrRightBracket = createParseAtLeastOneFunction parseLeftOrRightBracket
-                in
-                    [
-                        test "parseAtLeastOne" (
-                            assertEqual
-                                (
-                                    ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([
-                                            UnlabelledAstNode (AstLeaf "<"),
-                                            UnlabelledAstNode (AstLeaf "<"),
-                                            UnlabelledAstNode (AstLeaf "<")
-                                        ])))
-                                    ,
-                                    [(RightAngleBracket,">")]
-                                )
-                                ((createParseAtLeastOneFunction parseLeftAngleBracketKeep) [
-                                    (LeftAngleBracket, "<"),
-                                    (LeftAngleBracket, "<"),
-                                    (LeftAngleBracket, "<"),
-                                    (RightAngleBracket, ">")
-                                ])
-                        )
-                        ,
-                        test "parseAtLeastOne" (
-                            assertEqual
-                                (
-                                    ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([
-                                        UnlabelledAstNode (AstLeaf "<"),
-                                        UnlabelledAstNode (AstLeaf ">")
-                                        ])))
-                                    ,
-                                    [(Word,"!")]
-                                )
-                                (parseAtLeastOneLeftOrRightBracket [
-                                    (LeftAngleBracket, "<"),
-                                    (LeftAngleBracket, ">"),
-                                    (Word, "!")
-                                ])
-                        )
-                        ,
-                        test "parseAtLeastOne" (
-                            assertEqual
-                                (ParseDoesNotMatch,[(Word,"!"),(LeftAngleBracket,"<")])
-                                (parseAtLeastOneLeftOrRightBracket [
-                                    (Word, "!"),
-                                    (LeftAngleBracket, "<")
-                                ])
-                        )
-                    ]
-            )
-        )
-    ]
+--         )
+--         ,
+--         (suite "parseAny"
+--             (
+--                 let
+--                     parseLeftOrRightBracket =
+--                         (
+--                             createParseAnyFunction
+--                             [
+--                                 parseLeftAngleBracket,
+--                                 parseRightAngleBracket
+--                             ]
+--                         )
+--                 in
+--                     [
+--                         test "parseAny left" (
+--                             assertEqual
+--                                 (ParseMatchesReturnsNothing, [])
+--                                 (parseLeftOrRightBracket (tokenize "<"))
+--                         )
+--                         ,
+--                         test "parseAny right" (
+--                             assertEqual
+--                                 (ParseMatchesReturnsNothing, [])
+--                                 (parseLeftOrRightBracket (tokenize ">"))
+--                         )
+--                         ,
+--                         test "parseAny none" (
+--                             assertEqual
+--                                 (ParseDoesNotMatch, [(Word, "!")])
+--                                 (parseLeftOrRightBracket (tokenize "!"))
+--                         )
+--                     ]
+--             )
+--         )
+--         ,
+--         (suite "parseSequence"
+--             (
+--                 let
+--                     parseSimpleTag =
+--                         (
+--                             createParseSequenceFunction
+--                             [
+--                                 parseLeftAngleBracket,
+--                                 parseWordKeep,
+--                                 parseRightAngleBracket
+--                             ]
+--                         )
+--                 in
+--                     [
+--                         test "parseSequence" (
+--                             assertEqual
+--                                 (
+--                                     (ParseMatchesReturnsResult
+--                                         <| UnlabelledAstNode
+--                                         <| AstChildren [UnlabelledAstNode (AstLeaf "h1")]
+--                                     ),
+--                                     []
+--                                 )
+--                                 (parseSimpleTag (tokenize "<h1>"))
+--                         )
+--                         ,
+--                         test "parseSequence" (
+--                             assertEqual
+--                                 (ParseDoesNotMatch,[(LeftAngleBracket,"<"), (RightAngleBracket,">")])
+--                                 (parseSimpleTag (tokenize "<>"))
+--                         )
+--                         ,
+--                         test "parseSequence" (
+--                             let
+--                                 optionalMiddle =
+--                                     (
+--                                         createParseSequenceFunction
+--                                         [
+--                                             parseLeftAngleBracket,
+--                                             optional parseWordKeep,
+--                                             parseRightAngleBracket
+--                                         ]
+--                                     )
+--                             in
+--                                 assertEqual
+--                                     (
+--                                         (ParseMatchesReturnsResult
+--                                             <| UnlabelledAstNode
+--                                             <| AstChildren []
+--                                         ),
+--                                         []
+--                                     )
+--                                     (optionalMiddle (tokenize "<>"))
+--                         )
+--                     ]
+--             )
+--         )
+--         ,
+--         (suite "parseAtLeastOne"
+--             (
+--                 let
+--                     parseLeftOrRightBracket = createParseAnyFunction
+--                         [parseLeftAngleBracketKeep, parseRightAngleBracketKeep]
+--                     parseAtLeastOneLeftOrRightBracket = createParseAtLeastOneFunction parseLeftOrRightBracket
+--                 in
+--                     [
+--                         test "parseAtLeastOne" (
+--                             assertEqual
+--                                 (
+--                                     ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([
+--                                             UnlabelledAstNode (AstLeaf "<"),
+--                                             UnlabelledAstNode (AstLeaf "<"),
+--                                             UnlabelledAstNode (AstLeaf "<")
+--                                         ])))
+--                                     ,
+--                                     [(RightAngleBracket,">")]
+--                                 )
+--                                 ((createParseAtLeastOneFunction parseLeftAngleBracketKeep) [
+--                                     (LeftAngleBracket, "<"),
+--                                     (LeftAngleBracket, "<"),
+--                                     (LeftAngleBracket, "<"),
+--                                     (RightAngleBracket, ">")
+--                                 ])
+--                         )
+--                         ,
+--                         test "parseAtLeastOne" (
+--                             assertEqual
+--                                 (
+--                                     ParseMatchesReturnsResult (UnlabelledAstNode (AstChildren ([
+--                                         UnlabelledAstNode (AstLeaf "<"),
+--                                         UnlabelledAstNode (AstLeaf ">")
+--                                         ])))
+--                                     ,
+--                                     [(Word,"!")]
+--                                 )
+--                                 (parseAtLeastOneLeftOrRightBracket [
+--                                     (LeftAngleBracket, "<"),
+--                                     (LeftAngleBracket, ">"),
+--                                     (Word, "!")
+--                                 ])
+--                         )
+--                         ,
+--                         test "parseAtLeastOne" (
+--                             assertEqual
+--                                 (ParseDoesNotMatch,[(Word,"!"),(LeftAngleBracket,"<")])
+--                                 (parseAtLeastOneLeftOrRightBracket [
+--                                     (Word, "!"),
+--                                     (LeftAngleBracket, "<")
+--                                 ])
+--                         )
+--                     ]
+--             )
+--         )
+--     ]
 
-main = runSuiteHtml tests
+-- main = runSuiteHtml tests

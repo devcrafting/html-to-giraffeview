@@ -2,14 +2,14 @@ module HtmlParser.HtmlParserRawAst
     exposing
         ( xhtmlToRawAst
           -- , main
-        , tests
+        -- , tests
         )
 
 --------------------------------------------------------------------------------
 -- EXTERNAL DEPENDENCIES
 --------------------------------------------------------------------------------
 
-import Legacy.ElmTest exposing (..)
+-- import Legacy.ElmTest exposing (..)
 
 
 --------------------------------------------------------------------------------
@@ -19,13 +19,9 @@ import Legacy.ElmTest exposing (..)
 import Parser.Tokenizer exposing (..)
 import Parser.Parser
     exposing
-        ( ParseResult
-            ( ParseMatchesReturnsResult
-            , ParseMatchesReturnsNothing
-            , ParseDoesNotMatch
-            )
-        , AstNode(LabelledAstNode, UnlabelledAstNode)
-        , AstNodeValue(AstLeaf, AstChildren)
+        ( ParseResult(..)
+        , AstNode(..)
+        , AstNodeValue(..)
         , createParseSequenceFunction
         , createOptionallyParseMultipleFunction
         , labelled
@@ -301,207 +297,207 @@ testSelfClosingTagNode =
 -- tests -----------------------------------------------------------------------
 
 
-tests =
-    suite "HtmlParser.elm"
-        [ test "parseTagAttribute"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    UnlabelledAstNode <|
-                        AstChildren
-                            [ UnlabelledAstNode <|
-                                AstChildren
-                                    [ UnlabelledAstNode <| AstLeaf "class" ]
-                            , UnlabelledAstNode <|
-                                AstChildren
-                                    [ UnlabelledAstNode <| AstLeaf "success"
-                                    , UnlabelledAstNode <| AstLeaf " "
-                                    , UnlabelledAstNode <| AstLeaf "awesome"
-                                    ]
-                            ]
-                , []
-                )
-                (parseTagAttribute
-                    (tokenize """ class="success awesome" """)
-                )
-            )
-        , test "parseTagAttribute with single quote in value"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    UnlabelledAstNode <|
-                        AstChildren
-                            [ UnlabelledAstNode <|
-                                AstChildren
-                                    [ UnlabelledAstNode <| AstLeaf "placeholder" ]
-                            , UnlabelledAstNode <|
-                                AstChildren
-                                    [ UnlabelledAstNode <| AstLeaf "It"
-                                    , UnlabelledAstNode <| AstLeaf "'"
-                                    , UnlabelledAstNode <| AstLeaf "s"
-                                    , UnlabelledAstNode <| AstLeaf " "
-                                    , UnlabelledAstNode <| AstLeaf "great"
-                                    ]
-                            ]
-                , []
-                )
-                (parseTagAttribute
-                    (tokenize """ placeholder="It's great" """)
-                )
-            )
-        , test "parse boolean attribute"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    UnlabelledAstNode <|
-                        AstChildren
-                            [ UnlabelledAstNode <|
-                                AstChildren
-                                    [ UnlabelledAstNode <| AstLeaf "disabled" ]
-                            ]
-                , []
-                )
-                (parseTagAttribute
-                    (tokenize """ disabled """)
-                )
-            )
-        , test "parseMultipleAttributes"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    UnlabelledAstNode <|
-                        AstChildren
-                            [ attributeId1
-                            , attributeSuccessAwesome
-                            ]
-                , []
-                )
-                (parseTagAttributes
-                    (tokenize
-                        """ id="1" class="success awesome" """
-                    )
-                )
-            )
-        , test "parsedDashedAttribute"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    UnlabelledAstNode <|
-                        AstChildren
-                            [ UnlabelledAstNode <|
-                                AstChildren
-                                    [ UnlabelledAstNode <|
-                                        AstChildren
-                                            [ UnlabelledAstNode <| AstLeaf "data"
-                                            , UnlabelledAstNode <| AstLeaf "-"
-                                            , UnlabelledAstNode <| AstLeaf "name"
-                                            ]
-                                    , UnlabelledAstNode <|
-                                        AstChildren
-                                            [ UnlabelledAstNode <| AstLeaf "elm" ]
-                                    ]
-                            ]
-                , []
-                )
-                (parseTagAttributes (tokenize """ data-name="elm" """))
-            )
-        , test "parseClosingTag"
-            (assertEqual
-                ( ParseMatchesReturnsResult <| testClosingTagNode
-                , []
-                )
-                (parseClosingTag (tokenize "</div>"))
-            )
-        , test "parseOpeningTag no attributes"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    LabelledAstNode
-                        { label = "OPENING_TAG"
-                        , value =
-                            AstChildren
-                                [ UnlabelledAstNode <| AstLeaf "div"
-                                , UnlabelledAstNode <| AstChildren []
-                                ]
-                        }
-                , []
-                )
-                (parseOpeningTag
-                    (tokenize """<div >""")
-                )
-            )
-        , test "parseOpeningTag one attribute"
-            (assertEqual
-                ( ParseMatchesReturnsResult testOpeningTagNode
-                , []
-                )
-                (parseOpeningTag
-                    (tokenize """<div id="1" class="success awesome">""")
-                )
-            )
-        , test "parseSelfClosingTag"
-            (assertEqual
-                ( ParseMatchesReturnsResult <| testSelfClosingTagNode
-                , []
-                )
-                (parseSelfClosingTag
-                    (tokenize """<img id="1" class="success awesome" />""")
-                )
-            )
-        , test "parseTextNode"
-            (assertEqual
-                ( ParseMatchesReturnsResult <| testTextNode
-                , []
-                )
-                (parseTextNode (tokenize "one two"))
-            )
-        , test "parseTextNode"
-            (assertEqual
-                ( ParseDoesNotMatch
-                , [ ( LeftAngleBracket, "<" ) ]
-                )
-                (parseTextNode (tokenize "<"))
-            )
-        , test "parseTextNode"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    LabelledAstNode
-                        { label = "TEXT"
-                        , value =
-                            AstChildren
-                                [ UnlabelledAstNode <| AstLeaf " "
-                                ]
-                        }
-                , [ ( LeftAngleBracket, "<" ) ]
-                )
-                (parseTextNode [ ( Whitespace, " " ), ( LeftAngleBracket, "<" ) ])
-            )
-        , test "parseHtmlTokens"
-            (assertEqual
-                ( ParseMatchesReturnsResult <|
-                    UnlabelledAstNode <|
-                        AstChildren
-                            [ testOpeningTagNode
-                            , testTextNode
-                            , testClosingTagNode
-                            , testClosingTagNode
-                            , testTextNode
-                            , testOpeningTagNode
-                            ]
-                , []
-                )
-                (parseHtmlTokens
-                    (tokenize
-                        """ <div id="1" class="success awesome" >one two</div></div>one two<div id="1" class="success awesome" > """
-                    )
-                )
-            )
-        , test "parseComment"
-            (assertEqual
-                ( ParseMatchesReturnsNothing, [] )
-                (parseComment (tokenize """<!--hello world-->"""))
-            )
-        , test "parse empty string"
-            (assertEqual
-                ( ParseDoesNotMatch, [] )
-                (parseHtmlTokens (tokenize ""))
-            )
-        ]
+-- tests =
+--     suite "HtmlParser.elm"
+--         [ test "parseTagAttribute"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     UnlabelledAstNode <|
+--                         AstChildren
+--                             [ UnlabelledAstNode <|
+--                                 AstChildren
+--                                     [ UnlabelledAstNode <| AstLeaf "class" ]
+--                             , UnlabelledAstNode <|
+--                                 AstChildren
+--                                     [ UnlabelledAstNode <| AstLeaf "success"
+--                                     , UnlabelledAstNode <| AstLeaf " "
+--                                     , UnlabelledAstNode <| AstLeaf "awesome"
+--                                     ]
+--                             ]
+--                 , []
+--                 )
+--                 (parseTagAttribute
+--                     (tokenize """ class="success awesome" """)
+--                 )
+--             )
+--         , test "parseTagAttribute with single quote in value"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     UnlabelledAstNode <|
+--                         AstChildren
+--                             [ UnlabelledAstNode <|
+--                                 AstChildren
+--                                     [ UnlabelledAstNode <| AstLeaf "placeholder" ]
+--                             , UnlabelledAstNode <|
+--                                 AstChildren
+--                                     [ UnlabelledAstNode <| AstLeaf "It"
+--                                     , UnlabelledAstNode <| AstLeaf "'"
+--                                     , UnlabelledAstNode <| AstLeaf "s"
+--                                     , UnlabelledAstNode <| AstLeaf " "
+--                                     , UnlabelledAstNode <| AstLeaf "great"
+--                                     ]
+--                             ]
+--                 , []
+--                 )
+--                 (parseTagAttribute
+--                     (tokenize """ placeholder="It's great" """)
+--                 )
+--             )
+--         , test "parse boolean attribute"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     UnlabelledAstNode <|
+--                         AstChildren
+--                             [ UnlabelledAstNode <|
+--                                 AstChildren
+--                                     [ UnlabelledAstNode <| AstLeaf "disabled" ]
+--                             ]
+--                 , []
+--                 )
+--                 (parseTagAttribute
+--                     (tokenize """ disabled """)
+--                 )
+--             )
+--         , test "parseMultipleAttributes"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     UnlabelledAstNode <|
+--                         AstChildren
+--                             [ attributeId1
+--                             , attributeSuccessAwesome
+--                             ]
+--                 , []
+--                 )
+--                 (parseTagAttributes
+--                     (tokenize
+--                         """ id="1" class="success awesome" """
+--                     )
+--                 )
+--             )
+--         , test "parsedDashedAttribute"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     UnlabelledAstNode <|
+--                         AstChildren
+--                             [ UnlabelledAstNode <|
+--                                 AstChildren
+--                                     [ UnlabelledAstNode <|
+--                                         AstChildren
+--                                             [ UnlabelledAstNode <| AstLeaf "data"
+--                                             , UnlabelledAstNode <| AstLeaf "-"
+--                                             , UnlabelledAstNode <| AstLeaf "name"
+--                                             ]
+--                                     , UnlabelledAstNode <|
+--                                         AstChildren
+--                                             [ UnlabelledAstNode <| AstLeaf "elm" ]
+--                                     ]
+--                             ]
+--                 , []
+--                 )
+--                 (parseTagAttributes (tokenize """ data-name="elm" """))
+--             )
+--         , test "parseClosingTag"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <| testClosingTagNode
+--                 , []
+--                 )
+--                 (parseClosingTag (tokenize "</div>"))
+--             )
+--         , test "parseOpeningTag no attributes"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     LabelledAstNode
+--                         { label = "OPENING_TAG"
+--                         , value =
+--                             AstChildren
+--                                 [ UnlabelledAstNode <| AstLeaf "div"
+--                                 , UnlabelledAstNode <| AstChildren []
+--                                 ]
+--                         }
+--                 , []
+--                 )
+--                 (parseOpeningTag
+--                     (tokenize """<div >""")
+--                 )
+--             )
+--         , test "parseOpeningTag one attribute"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult testOpeningTagNode
+--                 , []
+--                 )
+--                 (parseOpeningTag
+--                     (tokenize """<div id="1" class="success awesome">""")
+--                 )
+--             )
+--         , test "parseSelfClosingTag"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <| testSelfClosingTagNode
+--                 , []
+--                 )
+--                 (parseSelfClosingTag
+--                     (tokenize """<img id="1" class="success awesome" />""")
+--                 )
+--             )
+--         , test "parseTextNode"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <| testTextNode
+--                 , []
+--                 )
+--                 (parseTextNode (tokenize "one two"))
+--             )
+--         , test "parseTextNode"
+--             (assertEqual
+--                 ( ParseDoesNotMatch
+--                 , [ ( LeftAngleBracket, "<" ) ]
+--                 )
+--                 (parseTextNode (tokenize "<"))
+--             )
+--         , test "parseTextNode"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     LabelledAstNode
+--                         { label = "TEXT"
+--                         , value =
+--                             AstChildren
+--                                 [ UnlabelledAstNode <| AstLeaf " "
+--                                 ]
+--                         }
+--                 , [ ( LeftAngleBracket, "<" ) ]
+--                 )
+--                 (parseTextNode [ ( Whitespace, " " ), ( LeftAngleBracket, "<" ) ])
+--             )
+--         , test "parseHtmlTokens"
+--             (assertEqual
+--                 ( ParseMatchesReturnsResult <|
+--                     UnlabelledAstNode <|
+--                         AstChildren
+--                             [ testOpeningTagNode
+--                             , testTextNode
+--                             , testClosingTagNode
+--                             , testClosingTagNode
+--                             , testTextNode
+--                             , testOpeningTagNode
+--                             ]
+--                 , []
+--                 )
+--                 (parseHtmlTokens
+--                     (tokenize
+--                         """ <div id="1" class="success awesome" >one two</div></div>one two<div id="1" class="success awesome" > """
+--                     )
+--                 )
+--             )
+--         , test "parseComment"
+--             (assertEqual
+--                 ( ParseMatchesReturnsNothing, [] )
+--                 (parseComment (tokenize """<!--hello world-->"""))
+--             )
+--         , test "parse empty string"
+--             (assertEqual
+--                 ( ParseDoesNotMatch, [] )
+--                 (parseHtmlTokens (tokenize ""))
+--             )
+--         ]
 
 
-main =
-    runSuiteHtml tests
+-- main =
+--     runSuiteHtml tests

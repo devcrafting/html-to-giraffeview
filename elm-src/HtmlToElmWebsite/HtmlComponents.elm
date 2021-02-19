@@ -20,7 +20,7 @@ githubStarButton :
   , user : String
   , type_ : String
   , repo: String
-  , style : List (String, String)
+  , style : List (Attribute msg)
   }
   -> Html msg
 githubStarButton params =
@@ -36,13 +36,16 @@ githubStarButton params =
             ++ params.size
         iframeWidth = if params.size == "small" then 170 else 160
         iframeHeight = if params.size == "small" then 20 else 30
+        attributes = List.concat [
+                    [ attribute "frameborder" "0"
+                    , attribute "scrolling" "0"
+                    , width iframeWidth
+                    , height iframeHeight
+                    , src url
+                    ]
+                    , params.style
+                ]
     in
         iframe
-            [ attribute "frameborder" "0"
-            , attribute "scrolling" "0"
-            , width iframeWidth
-            , height iframeHeight
-            , src url
-            , style params.style
-            ]
+            attributes
             []

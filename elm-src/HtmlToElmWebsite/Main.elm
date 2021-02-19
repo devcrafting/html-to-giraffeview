@@ -1,4 +1,4 @@
-port module Main exposing (..)
+port module  HtmlToElmWebsite.Main exposing (..)
 
 import Task
 
@@ -6,12 +6,14 @@ import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Window
+import Browser
 -- import Debug exposing (..)
 import HtmlToElmWebsite.Layout as Layout
 import HtmlToElmWebsite.HtmlComponents exposing (githubStarButton)
 import HtmlToElmWebsite.HtmlExamples exposing (htmlExamples)
 import HtmlToElm.HtmlToElm exposing (htmlToElm)
+import Browser.Events
+import Browser.Dom exposing (Error(..))
 
 -- type alias StringAddress = Signal.Address String
 
@@ -23,21 +25,21 @@ import HtmlToElm.HtmlToElm exposing (htmlToElm)
 
 topBar : Html Msg
 topBar =
-    div [ class "top-bar", style Layout.topBar ]
+    div (Layout.topBar [ class "top-bar" ])
         [ div
             []
             [ p
-                [ style [("float", "left")]]
+                [ style "float" "left"]
                 [ text "HTML to Elm" ]
             , div
-                [ style [("float", "right"), ("font-size", "14px")]]
+                [ style "float" "right", style "font-size" "14px"]
                 [ a
                     [ href "https://github.com/mbylstra/html-to-elm"
-                    , style [("margin-right", "10px")]
+                    , style "margin-right" "10px"
                     ]
                     [ img
                         [ src "https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-16.png"
-                        , style [("vertical-align", "text-top")]
+                        , style "vertical-align" "text-top"
                         ]
                         []
                     , text " https://github.com/mbylstra/html-to-elm"
@@ -47,7 +49,7 @@ topBar =
                     , repo="html-to-elm"
                     , type_="star"
                     , size="small"
-                    , style=[("vertical-align", "middle"), ("margin-top", "-5px")]
+                    , style=[ style "vertical-align" "middle", style "margin-top" "-5px" ]
                     }
                 ]
             ]
@@ -71,11 +73,9 @@ snippetButtons =
 leftPanel : Model -> Html Msg
 leftPanel model =
     div
-        [ class "left-panel", style <| Layout.leftPanel model.windowSize ]
+        (Layout.leftPanel model.windowSize [ class "left-panel" ])
         [ div
-            [ style Layout.panelHeader
-            , class "left-panel-heading"
-            ]
+            (Layout.panelHeader [ class "left-panel-heading"])
             [ text "Type or paste HTML here" ]
         , div
             []
@@ -90,9 +90,7 @@ leftPanel model =
                 [ ]
             ]
         , div
-            [ style Layout.panelHeader
-            , class "left-panel-heading"
-            ]
+            (Layout.panelHeader [ class "left-panel-heading" ])
             ([ text "snippets: " ]  ++  snippetButtons)
         ]
 
@@ -100,10 +98,10 @@ leftPanel model =
 copyButton : Bool -> Html Msg
 copyButton visible =
     let
-        style_ = if visible then [] else [("display", "none")]
+        style_ = if visible then [] else [ style "display" "none" ]
     in
         div
-          [ id "copy-button",  style style_, class "copy-button" ]
+          ([ id "copy-button", class "copy-button" ] ++ style_)
           [ text "copy"]
 
 
@@ -124,26 +122,20 @@ rightPanel model =
 
     in
         div
-            [ class "right-panel", style <| Layout.rightPanel model.windowSize]
+            (Layout.rightPanel model.windowSize [ class "right-panel" ])
             [ div
-                [ style Layout.panelHeader
-                , class "right-panel-heading"
-                ]
+                (Layout.panelHeader [ class "right-panel-heading" ])
                 [ text "Elm code appears here (see "
                 , a [href "https://github.com/elm-lang/html", target "_blank"] [ text "elm-lang/html"]
                 , text ")"
                 ]
             , div
-                [ style <| Layout.panelContent model.windowSize
-                , class "elm-code"
-                ]
+                (Layout.panelContent model.windowSize [ class "elm-code" ])
                 [ hint
                 , pre [id "elm-code", class "elm"] []
                 ]
             , div
-                [ style Layout.panelHeader
-                , class "right-panel-heading"
-                ]
+                (Layout.panelHeader [ class "right-panel-heading" ])
                 [ text "indent spaces: "
                 , span
                     [ class "example-button"
@@ -164,10 +156,14 @@ type Msg =
     LoadSnippet String
     | SetIndentSpaces Int
     | HtmlUpdated String
-    | WindowSizeChanged Window.Size
+    | WindowSizeChanged WindowSize
     | ElmDomReady
     | NoOp
 
+type alias WindowSize = {
+        width: Int,
+        height: Int
+    }
 
 -- actionsMailbox : Signal.Mailbox (Maybe Msg)
 -- actionsMailbox = Signal.mailbox Nothing
@@ -185,10 +181,10 @@ update msg model =
             let
               elmCode = (htmlToElm model.indentSpaces) html
             in
-              { model |
+              ({ model |
                 html = html
               , elmCode = elmCode
-              } ! [ outgoingElmCode elmCode ]
+              }, outgoingElmCode elmCode)
         LoadSnippet snippetName ->
             let
               snippet =
@@ -197,25 +193,25 @@ update msg model =
                       Nothing -> ""
 
             in
-              { model | currentSnippet = snippet }
-              ! [ currentSnippet snippet ]
+              ({ model | currentSnippet = snippet }
+              , currentSnippet snippet)
         SetIndentSpaces indentSpaces ->
             let
               newModel = { model | indentSpaces = indentSpaces }
             in
-              newModel !
-                [ Task.perform identity (Task.succeed (HtmlUpdated model.html)) ]
+              (newModel,
+                Task.perform identity (Task.succeed (HtmlUpdated model.html)))
         WindowSizeChanged size ->
-            { model | windowSize = size } ! []
+            ({ model | windowSize = size }, Cmd.none)
         ElmDomReady ->
-          model !
-            [ elmDomReady "" ]
+          (model,
+            elmDomReady "")
         NoOp ->
-          model ! []
+          (model, Cmd.none)
 
 
         -- Nothing ->
-        --     Debug.crash "This should never happen."
+        --     Debug.todo "This should never happen."
 
 
 type alias Model =
@@ -223,7 +219,7 @@ type alias Model =
     , elmCode: Maybe String
     , indentSpaces : Int
     , currentSnippet : String
-    , windowSize : Window.Size
+    , windowSize : WindowSize
     }
 
 
@@ -285,13 +281,10 @@ view model =
 
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-  Html.program
-    { init = initialModel !
-      [ Task.perform (\size -> WindowSizeChanged size) Window.size
-      , Task.perform identity (Task.succeed ElmDomReady)
-      ]
+  Browser.element
+    { init = \_ -> (initialModel, Task.perform identity (Task.succeed ElmDomReady))
     , update = update
     , view = view
     , subscriptions = subscriptions
@@ -299,8 +292,11 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
+  Sub.batch [
   -- suggestions Suggest
-  incomingHtmlCode HtmlUpdated
+    incomingHtmlCode HtmlUpdated,
+    Browser.Events.onResize (\w h -> WindowSizeChanged { width = w, height = h })
+  ]
 
 -- subscriptions model =
 --   Window.resizes (\size -> WindowSizeChanged size)

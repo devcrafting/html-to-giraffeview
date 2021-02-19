@@ -1,8 +1,8 @@
 module HtmlParser.HtmlParser exposing
     ( parseHtml
-    , Node(Element, Text)
+    , Node(..)
     -- , main
-    , tests
+    -- , tests
     )
 
 
@@ -10,7 +10,7 @@ module HtmlParser.HtmlParser exposing
 -- EXTERNAL DEPENDENCIES
 --------------------------------------------------------------------------------
 import Dict exposing (Dict)
-import Legacy.ElmTest exposing (..)
+-- import Legacy.ElmTest exposing (..)
 import Maybe exposing (Maybe)
 
 
@@ -20,13 +20,9 @@ import Maybe exposing (Maybe)
 
 import HtmlParser.HtmlParserRawAst exposing (xhtmlToRawAst)
 import Parser.Parser exposing
-    ( ParseResult
-        ( ParseMatchesReturnsResult
-        , ParseMatchesReturnsNothing
-        , ParseDoesNotMatch
-        )
-    , AstNode(LabelledAstNode, UnlabelledAstNode)
-    , AstNodeValue(AstLeaf, AstChildren)
+    ( ParseResult(..)
+    , AstNode(..)
+    , AstNodeValue(..)
     )
 import Parser.ParserHelpers exposing
     ( concatLeafs
@@ -170,7 +166,7 @@ getAstNodeType astNode =
                     _ ->
                         nodeType
             Nothing ->
-                Debug.crash("")
+                Debug.todo("")
 
 
 flatAstToTree : AstNode -> List AstNode   ->   (Node, List AstNode)
@@ -226,11 +222,11 @@ astNodeToHtmlNode astNode =
         case astNodes of
             [] ->
                 Nothing
-            headNode::tailNodes ->
+            headNode_::tailNodes_ ->
                 case getAstNodeType headNode of
                     OpeningTagAstNode ->
                         let
-                            (node, _) = flatAstToTree headNode tailNodes
+                            (node, _) = flatAstToTree headNode_ tailNodes_
                         in
                             Just node
                     _ ->
@@ -246,7 +242,7 @@ parseHtml s =
                 Nothing
             ParseMatchesReturnsResult astNode ->
                 astNodeToHtmlNode astNode
-            _ -> Debug.crash("")
+            _ -> Debug.todo("")
 
 
 
@@ -254,207 +250,207 @@ parseHtml s =
 -- TESTS
 --------------------------------------------------------------------------------
 
-testAttribute1 =
-    UnlabelledAstNode <| AstChildren
-        [
-            UnlabelledAstNode <| AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "class"
-                ]
-            ,
-            UnlabelledAstNode <| AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "success",
-                    UnlabelledAstNode <| AstLeaf " ",
-                    UnlabelledAstNode <| AstLeaf "awesome"
-                ]
-        ]
+-- testAttribute1 =
+--     UnlabelledAstNode <| AstChildren
+--         [
+--             UnlabelledAstNode <| AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "class"
+--                 ]
+--             ,
+--             UnlabelledAstNode <| AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "success",
+--                     UnlabelledAstNode <| AstLeaf " ",
+--                     UnlabelledAstNode <| AstLeaf "awesome"
+--                 ]
+--         ]
 
-testAttribute2 =
-    UnlabelledAstNode <| AstChildren
-        [
-            UnlabelledAstNode <| AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "id"
-                ]
-            ,
-            UnlabelledAstNode <| AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "1"
-                ]
-        ]
+-- testAttribute2 =
+--     UnlabelledAstNode <| AstChildren
+--         [
+--             UnlabelledAstNode <| AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "id"
+--                 ]
+--             ,
+--             UnlabelledAstNode <| AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "1"
+--                 ]
+--         ]
 
-testAttribute3 =
-    UnlabelledAstNode <| AstChildren
-        [
-            UnlabelledAstNode <| AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "data",
-                    UnlabelledAstNode <| AstLeaf "-",
-                    UnlabelledAstNode <| AstLeaf "name"
-                ]
-            ,
-            UnlabelledAstNode <| AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "elm"
-                ]
-        ]
+-- testAttribute3 =
+--     UnlabelledAstNode <| AstChildren
+--         [
+--             UnlabelledAstNode <| AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "data",
+--                     UnlabelledAstNode <| AstLeaf "-",
+--                     UnlabelledAstNode <| AstLeaf "name"
+--                 ]
+--             ,
+--             UnlabelledAstNode <| AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "elm"
+--                 ]
+--         ]
 
-testAttributes =
-    UnlabelledAstNode <| AstChildren [testAttribute1, testAttribute2]
+-- testAttributes =
+--     UnlabelledAstNode <| AstChildren [testAttribute1, testAttribute2]
 
-testAttributes2 =
-    UnlabelledAstNode <| AstChildren [testAttribute3]
+-- testAttributes2 =
+--     UnlabelledAstNode <| AstChildren [testAttribute3]
 
-testOpeningTag =
-    LabelledAstNode
-        {
-            label = "OPENING_TAG",
-            value = AstChildren
-                [
-                    UnlabelledAstNode <| AstLeaf "div",
-                    testAttributes
-                ]
+-- testOpeningTag =
+--     LabelledAstNode
+--         {
+--             label = "OPENING_TAG",
+--             value = AstChildren
+--                 [
+--                     UnlabelledAstNode <| AstLeaf "div",
+--                     testAttributes
+--                 ]
 
-        }
+--         }
 
-assumeParseSuccess : ParseResult -> AstNode
-assumeParseSuccess parseResult =
-    case parseResult of
-        ParseMatchesReturnsResult result -> result
-        _ -> Debug.crash("")
+-- assumeParseSuccess : ParseResult -> AstNode
+-- assumeParseSuccess parseResult =
+--     case parseResult of
+--         ParseMatchesReturnsResult result -> result
+--         _ -> Debug.todo("")
 
-assumeSuccess : Maybe a -> a
-assumeSuccess x =
-    case x of
-        Just x_ -> x_
-        _ -> Debug.crash("")
+-- assumeSuccess : Maybe a -> a
+-- assumeSuccess x =
+--     case x of
+--         Just x_ -> x_
+--         _ -> Debug.todo("")
 
-simpleHtmlResult = xhtmlToRawAst "<h1>hello world</h1>"
-simpleHtmlAstNode = assumeParseSuccess simpleHtmlResult
+-- simpleHtmlResult = xhtmlToRawAst "<h1>hello world</h1>"
+-- simpleHtmlAstNode = assumeParseSuccess simpleHtmlResult
 
-nestedHtmlAstNode = assumeParseSuccess <| xhtmlToRawAst "<div><h1>hello world</h1></div>"
+-- nestedHtmlAstNode = assumeParseSuccess <| xhtmlToRawAst "<div><h1>hello world</h1></div>"
 
 
-tests = suite "HtmlParser.elm"
-    [
-        test "attributesToDict" (
-            assertEqual
-                ("class", "success awesome")
-                (attributeToTuple testAttribute1)
-        )
-        ,
-        test "attributeToTuple" (
-            assertEqual
-                (Dict.fromList [("class", "success awesome"), ("id", "1")])
-                (attributesToDict testAttributes)
-        )
-        ,
-        test "attributeToTuple (dashed)" (
-            assertEqual
-                (Dict.fromList [("data-name", "elm")])
-                (attributesToDict testAttributes2)
-        )
-        ,
-        test "convertOpeningTag" (
-            assertEqual
-                (Element
-                    {
-                        tagName = "div",
-                        attributes = (Dict.fromList [("class", "success awesome"), ("id", "1")]),
-                        children = []
-                    }
-                )
-                (convertOpeningTag  testOpeningTag)
-        )
-        ,
-        test "appendNode" (
-            assertEqual
-                (Element
-                    {
-                        tagName = "div",
-                        attributes = (Dict.fromList []),
-                        children = [Text "hello"]
-                    }
-                )
-                (appendNode
-                    (Element
-                        {
-                            tagName = "div",
-                            attributes = (Dict.fromList []),
-                            children = []
-                        }
-                    )
-                    (Text "hello")
-                )
-        )
-        ,
-        test "getAstNodeType" (
-            assertEqual
-                OpeningTagAstNode
-                (getAstNodeType testOpeningTag)
-        )
-        ,
-        test "astNodeToHtmlNode" (
-            assertEqual
-                (Element
-                    {
-                        tagName="h1",
-                        attributes=Dict.empty,
-                        children= [Text "hello world"]
-                    }
-                )
-                (assumeSuccess <| astNodeToHtmlNode simpleHtmlAstNode)
-        )
-        ,
-        test "testNestedHtml" (
-            assertEqual
-                (Element
-                    {
-                        tagName = "div",
-                        attributes = Dict.empty,
-                        children = [
-                            Element
-                                {
-                                    tagName = "h1",
-                                    attributes = Dict.empty,
-                                    children = [Text "hello world"]
-                                }
-                        ]
-                    }
-                )
-                (assumeSuccess <| astNodeToHtmlNode nestedHtmlAstNode)
-        )
-        ,
-        test "testSelfClosing" (
-            assertEqual
-                (Element
-                    {
-                        tagName = "div",
-                        attributes = Dict.fromList [],
-                        children = [
-                            Element
-                                {
-                                    tagName = "img",
-                                    attributes = Dict.fromList [("src","test.jpg")],
-                                    children = []
-                                }
-                            ]
-                    }
-                )
-                (assumeSuccess <| astNodeToHtmlNode <| assumeParseSuccess <| xhtmlToRawAst """<div><img src="test.jpg"/></div>""")
-        )
-        , test "boolean attribute"
-            ( assertEqual
-                (Element
-                    { tagName = "div"
-                    , attributes = Dict.fromList [("disabled","")]
-                    , children = []
-                    }
-                )
-                (assumeSuccess <| astNodeToHtmlNode <| assumeParseSuccess <| xhtmlToRawAst """<div disabled></div>""")
-        )
-    ]
+-- tests = suite "HtmlParser.elm"
+--     [
+--         test "attributesToDict" (
+--             assertEqual
+--                 ("class", "success awesome")
+--                 (attributeToTuple testAttribute1)
+--         )
+--         ,
+--         test "attributeToTuple" (
+--             assertEqual
+--                 (Dict.fromList [("class", "success awesome"), ("id", "1")])
+--                 (attributesToDict testAttributes)
+--         )
+--         ,
+--         test "attributeToTuple (dashed)" (
+--             assertEqual
+--                 (Dict.fromList [("data-name", "elm")])
+--                 (attributesToDict testAttributes2)
+--         )
+--         ,
+--         test "convertOpeningTag" (
+--             assertEqual
+--                 (Element
+--                     {
+--                         tagName = "div",
+--                         attributes = (Dict.fromList [("class", "success awesome"), ("id", "1")]),
+--                         children = []
+--                     }
+--                 )
+--                 (convertOpeningTag  testOpeningTag)
+--         )
+--         ,
+--         test "appendNode" (
+--             assertEqual
+--                 (Element
+--                     {
+--                         tagName = "div",
+--                         attributes = (Dict.fromList []),
+--                         children = [Text "hello"]
+--                     }
+--                 )
+--                 (appendNode
+--                     (Element
+--                         {
+--                             tagName = "div",
+--                             attributes = (Dict.fromList []),
+--                             children = []
+--                         }
+--                     )
+--                     (Text "hello")
+--                 )
+--         )
+--         ,
+--         test "getAstNodeType" (
+--             assertEqual
+--                 OpeningTagAstNode
+--                 (getAstNodeType testOpeningTag)
+--         )
+--         ,
+--         test "astNodeToHtmlNode" (
+--             assertEqual
+--                 (Element
+--                     {
+--                         tagName="h1",
+--                         attributes=Dict.empty,
+--                         children= [Text "hello world"]
+--                     }
+--                 )
+--                 (assumeSuccess <| astNodeToHtmlNode simpleHtmlAstNode)
+--         )
+--         ,
+--         test "testNestedHtml" (
+--             assertEqual
+--                 (Element
+--                     {
+--                         tagName = "div",
+--                         attributes = Dict.empty,
+--                         children = [
+--                             Element
+--                                 {
+--                                     tagName = "h1",
+--                                     attributes = Dict.empty,
+--                                     children = [Text "hello world"]
+--                                 }
+--                         ]
+--                     }
+--                 )
+--                 (assumeSuccess <| astNodeToHtmlNode nestedHtmlAstNode)
+--         )
+--         ,
+--         test "testSelfClosing" (
+--             assertEqual
+--                 (Element
+--                     {
+--                         tagName = "div",
+--                         attributes = Dict.fromList [],
+--                         children = [
+--                             Element
+--                                 {
+--                                     tagName = "img",
+--                                     attributes = Dict.fromList [("src","test.jpg")],
+--                                     children = []
+--                                 }
+--                             ]
+--                     }
+--                 )
+--                 (assumeSuccess <| astNodeToHtmlNode <| assumeParseSuccess <| xhtmlToRawAst """<div><img src="test.jpg"/></div>""")
+--         )
+--         , test "boolean attribute"
+--             ( assertEqual
+--                 (Element
+--                     { tagName = "div"
+--                     , attributes = Dict.fromList [("disabled","")]
+--                     , children = []
+--                     }
+--                 )
+--                 (assumeSuccess <| astNodeToHtmlNode <| assumeParseSuccess <| xhtmlToRawAst """<div disabled></div>""")
+--         )
+--     ]
 
-main =
-    runSuiteHtml tests
+-- main =
+--     runSuiteHtml tests
