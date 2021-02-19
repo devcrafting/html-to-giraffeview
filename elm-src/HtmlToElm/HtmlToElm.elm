@@ -110,7 +110,11 @@ renderVerticalChild node =
                     (renderTagFunctionHead tagName) ++ " " ++ (renderAttributes attributes)
                 childrenLines =
                     case children of
-                        [] -> [IndentTreeLeaf "[]"]
+                        [] ->
+                            case tagName of
+                                "br" -> []
+                                "img" -> []
+                                _ -> [IndentTreeLeaf "[]"]
                         _ -> formatFsharpMultilineList (List.map renderNode children)
 
             in

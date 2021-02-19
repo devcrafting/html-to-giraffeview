@@ -5851,8 +5851,8 @@ var $author$project$HtmlToElm$HtmlToElm$formatFsharpMultilineList = function (in
 				return _Debug_todo(
 					'HtmlToElm.HtmlToElm',
 					{
-						start: {line: 204, column: 21},
-						end: {line: 204, column: 31}
+						start: {line: 208, column: 21},
+						end: {line: 208, column: 31}
 					})('');
 			}
 		}
@@ -5877,8 +5877,8 @@ var $author$project$HtmlToElm$HtmlToElm$formatFsharpMultilineList = function (in
 				return _Debug_todo(
 					'HtmlToElm.HtmlToElm',
 					{
-						start: {line: 194, column: 21},
-						end: {line: 194, column: 31}
+						start: {line: 198, column: 21},
+						end: {line: 198, column: 31}
 					})('');
 			}
 		}
@@ -6039,10 +6039,17 @@ var $author$project$HtmlToElm$HtmlToElm$renderVerticalChild = function (node) {
 		var firstLine = $author$project$HtmlToElm$HtmlToElm$renderTagFunctionHead(tagName) + (' ' + $author$project$HtmlToElm$HtmlToElm$renderAttributes(attributes));
 		var childrenLines = function () {
 			if (!children.b) {
-				return _List_fromArray(
-					[
-						$author$project$HtmlToElm$HtmlToElm$IndentTreeLeaf('[]')
-					]);
+				switch (tagName) {
+					case 'br':
+						return _List_Nil;
+					case 'img':
+						return _List_Nil;
+					default:
+						return _List_fromArray(
+							[
+								$author$project$HtmlToElm$HtmlToElm$IndentTreeLeaf('[]')
+							]);
+				}
 			} else {
 				return $author$project$HtmlToElm$HtmlToElm$formatFsharpMultilineList(
 					A2($elm$core$List$map, $author$project$HtmlToElm$HtmlToElm$renderNode, children));
