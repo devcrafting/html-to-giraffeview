@@ -14,6 +14,7 @@ import HtmlToElmWebsite.HtmlExamples exposing (htmlExamples)
 import HtmlToElm.HtmlToElm exposing (htmlToElm)
 import Browser.Events
 import Browser.Dom exposing (Error(..))
+import String
 
 -- type alias StringAddress = Signal.Address String
 
@@ -277,14 +278,15 @@ view model =
 -- port windowHeight = Window.height
 
 
-
-
-
+toInt f = String.fromFloat f |> String.toInt |> Maybe.withDefault 0
 
 main : Program () Model Msg
 main =
   Browser.element
-    { init = \_ -> (initialModel, Task.perform identity (Task.succeed ElmDomReady))
+    { init = \_ ->
+        (initialModel, Cmd.batch [
+            Task.perform (\v -> WindowSizeChanged { width = toInt v.viewport.width, height = toInt v.viewport.height }) Browser.Dom.getViewport
+            , Task.perform identity (Task.succeed ElmDomReady)])
     , update = update
     , view = view
     , subscriptions = subscriptions
