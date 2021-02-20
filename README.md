@@ -2,6 +2,8 @@
 
 An online tool for converting HTML to [Giraffe.ViewEngine](https://github.com/giraffe-fsharp/Giraffe.ViewEngine) code (based on [HTML-to-ELM](https://github.com/mbylstra/html-to-elm)).
 
+Available online: http://devcrafting.github.io/html-to-giraffeview/
+
 ## Run locally
 
 Install Elm (work with Elm 0.19) : https://guide.elm-lang.org/install/
