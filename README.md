@@ -8,4 +8,4 @@ Install Elm (work with Elm 0.19) : https://guide.elm-lang.org/install/
 
 Run `./build.sh` to generate Main.js in js dir.
 
-Open index.html in your browser, it should work.
+Open `website/index.html` in your browser, it should work.
