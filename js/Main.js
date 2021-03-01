@@ -7323,7 +7323,7 @@ var $author$project$HtmlToElmWebsite$Main$rightPanel = function (model) {
 						])),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Elm code appears here (see '),
+						$elm$html$Html$text('GiraffeView code appears here (see '),
 						A2(
 						$elm$html$Html$a,
 						_List_fromArray(
@@ -7504,7 +7504,7 @@ var $author$project$HtmlToElmWebsite$Main$topBar = A2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('HTML to Elm')
+							$elm$html$Html$text('HTML to GiraffeView')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -7519,7 +7519,7 @@ var $author$project$HtmlToElmWebsite$Main$topBar = A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$href('https://github.com/mbylstra/html-to-elm'),
+									$elm$html$Html$Attributes$href('https://github.com/devcrafting/html-to-giraffeview'),
 									A2($elm$html$Html$Attributes$style, 'margin-right', '10px')
 								]),
 							_List_fromArray(
@@ -7532,11 +7532,22 @@ var $author$project$HtmlToElmWebsite$Main$topBar = A2(
 											A2($elm$html$Html$Attributes$style, 'vertical-align', 'text-top')
 										]),
 									_List_Nil),
-									$elm$html$Html$text(' https://github.com/mbylstra/html-to-elm')
+									$elm$html$Html$text(' https://github.com/devcrafting/html-to-giraffeview')
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$href('https://github.com/mbylstra/html-to-elm'),
+									A2($elm$html$Html$Attributes$style, 'margin-right', '10px')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('forked from https://github.com/mbylstra/html-to-elm')
 								])),
 							$author$project$HtmlToElmWebsite$HtmlComponents$githubStarButton(
 							{
-								repo: 'html-to-elm',
+								repo: 'html-to-giraffeview',
 								size: 'small',
 								style: _List_fromArray(
 									[
@@ -7544,7 +7555,7 @@ var $author$project$HtmlToElmWebsite$Main$topBar = A2(
 										A2($elm$html$Html$Attributes$style, 'margin-top', '-5px')
 									]),
 								type_: 'star',
-								user: 'mbylstra'
+								user: 'devcrafting'
 							})
 						]))
 				]))

@@ -31,11 +31,11 @@ topBar =
             []
             [ p
                 [ style "float" "left"]
-                [ text "HTML to Elm" ]
+                [ text "HTML to GiraffeView" ]
             , div
                 [ style "float" "right", style "font-size" "14px"]
                 [ a
-                    [ href "https://github.com/mbylstra/html-to-elm"
+                    [ href "https://github.com/devcrafting/html-to-giraffeview"
                     , style "margin-right" "10px"
                     ]
                     [ img
@@ -43,11 +43,16 @@ topBar =
                         , style "vertical-align" "text-top"
                         ]
                         []
-                    , text " https://github.com/mbylstra/html-to-elm"
+                    , text " https://github.com/devcrafting/html-to-giraffeview"
                     ]
+                , a
+                    [ href "https://github.com/mbylstra/html-to-elm"
+                    , style "margin-right" "10px"
+                    ]
+                    [ text "forked from https://github.com/mbylstra/html-to-elm"]
                 , githubStarButton
-                    { user="mbylstra"
-                    , repo="html-to-elm"
+                    { user="devcrafting"
+                    , repo="html-to-giraffeview"
                     , type_="star"
                     , size="small"
                     , style=[ style "vertical-align" "middle", style "margin-top" "-5px" ]
@@ -126,7 +131,7 @@ rightPanel model =
             (Layout.rightPanel model.windowSize [ class "right-panel" ])
             [ div
                 (Layout.panelHeader [ class "right-panel-heading" ])
-                [ text "Elm code appears here (see "
+                [ text "GiraffeView code appears here (see "
                 , a [href "https://github.com/elm-lang/html", target "_blank"] [ text "elm-lang/html"]
                 , text ")"
                 ]
