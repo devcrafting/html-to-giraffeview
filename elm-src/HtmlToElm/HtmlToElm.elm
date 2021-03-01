@@ -36,18 +36,18 @@ type alias IndentFunction = Int -> Int -> String   ->   String
 
 renderAttribute : (String, String) -> String
 renderAttribute (key, value) =
-    if
-        List.member key implementedAttributeFunctions
+    -- if
+    --     List.member key implementedAttributeFunctions
 
-    then
+    -- then
         "_" ++ key ++ " " ++ "\"" ++ value ++ "\""
-    else
-        if
-            List.member key reservedWords
-        then
-            "_" ++ key ++ "_ " ++ "\"" ++ value ++ "\""
-        else
-            "attribute \"" ++ key ++ "\""  ++ " \"" ++ value ++ "\""
+    -- else
+    --     if
+    --         List.member key reservedWords
+    --     then
+    --         "_" ++ key ++ "_ " ++ "\"" ++ value ++ "\""
+    --     else
+    --         "attribute \"" ++ key ++ "\""  ++ " \"" ++ value ++ "\""
 -- TODO: look this app in the attributes whitelist
 
 
