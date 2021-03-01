@@ -5922,8 +5922,23 @@ var $author$project$HtmlToElm$HtmlToElm$formatFsharpMultilineList = function (in
 		return indentTrees;
 	}
 };
-var $author$project$HtmlToElm$ElmHtmlWhitelists$implementedAttributeFunctions = _List_fromArray(
-	['key', 'class', 'classList', 'id', 'title', 'type_', 'value', 'placeholder', 'accept', 'acceptCharset', 'action', 'autosave', 'enctype', 'formaction', 'list', 'method', 'name', 'pattern', 'for', 'form', 'max', 'min', 'step', 'wrap', 'href', 'target', 'downloadAs', 'hreflang', 'media', 'ping', 'rel', 'usemap', 'shape', 'coords', 'src', 'alt', 'preload', 'poster', 'kind', 'srclang', 'sandbox', 'srcdoc', 'align', 'headers', 'scope', 'charset', 'content', 'httpEquiv', 'language', 'accesskey', 'contextmenu', 'dir', 'draggable', 'dropzone', 'itemprop', 'lang', 'challenge', 'keytype', 'cite', 'datetime', 'pubdate', 'manifest', 'property', 'attribute', 'd', 'fill', 'viewBox']);
+var $author$project$HtmlToElm$HtmlToElm$renderAttribute = function (_v0) {
+	var key = _v0.a;
+	var value = _v0.b;
+	return '_' + (key + (' ' + ('\"' + (value + '\"'))));
+};
+var $author$project$HtmlToElm$HtmlToElm$renderAttributes = function (attributes) {
+	var attributesList = $elm$core$Dict$toList(attributes);
+	var attributeListString = A2($elm$core$List$map, $author$project$HtmlToElm$HtmlToElm$renderAttribute, attributesList);
+	var innards = A2($elm$core$String$join, '; ', attributeListString);
+	if (innards === '') {
+		return '[]';
+	} else {
+		return '[ ' + (innards + ' ]');
+	}
+};
+var $author$project$HtmlToElm$ElmHtmlWhitelists$implementedTagFunctions = _List_fromArray(
+	['body', 'section', 'nav', 'article', 'aside', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'footer', 'address', 'p', 'hr', 'pre', 'blockquote', 'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'figure', 'figcaption', 'div', 'a', 'em', 'strong', 'small', 's', 'cite', 'q', 'dfn', 'abbr', 'time', 'code', 'var', 'samp', 'kbd', 'sub', 'sup', 'i', 'b', 'u', 'mark', 'ruby', 'rt', 'rp', 'bdi', 'bdo', 'span', 'br', 'wbr', 'ins', 'del', 'img', 'iframe', 'embed', 'object', 'param', 'video', 'audio', 'source', 'track', 'canvas', 'svg', 'math', 'table', 'caption', 'colgroup', 'col', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'form', 'fieldset', 'legend', 'label', 'input', 'button', 'select', 'datalist', 'optgroup', 'option', 'textarea', 'keygen', 'output', 'progress', 'meter', 'details', 'summary', 'menuitem', 'menu', 'defs', 'clipPath', 'path', 'g']);
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5956,23 +5971,6 @@ var $elm$core$List$member = F2(
 	});
 var $author$project$HtmlToElm$ElmHtmlWhitelists$reservedWords = _List_fromArray(
 	['main', 'type']);
-var $author$project$HtmlToElm$HtmlToElm$renderAttribute = function (_v0) {
-	var key = _v0.a;
-	var value = _v0.b;
-	return A2($elm$core$List$member, key, $author$project$HtmlToElm$ElmHtmlWhitelists$implementedAttributeFunctions) ? ('_' + (key + (' ' + ('\"' + (value + '\"'))))) : (A2($elm$core$List$member, key, $author$project$HtmlToElm$ElmHtmlWhitelists$reservedWords) ? ('_' + (key + ('_ ' + ('\"' + (value + '\"'))))) : ('attribute \"' + (key + ('\"' + (' \"' + (value + '\"'))))));
-};
-var $author$project$HtmlToElm$HtmlToElm$renderAttributes = function (attributes) {
-	var attributesList = $elm$core$Dict$toList(attributes);
-	var attributeListString = A2($elm$core$List$map, $author$project$HtmlToElm$HtmlToElm$renderAttribute, attributesList);
-	var innards = A2($elm$core$String$join, '; ', attributeListString);
-	if (innards === '') {
-		return '[]';
-	} else {
-		return '[ ' + (innards + ' ]');
-	}
-};
-var $author$project$HtmlToElm$ElmHtmlWhitelists$implementedTagFunctions = _List_fromArray(
-	['body', 'section', 'nav', 'article', 'aside', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'footer', 'address', 'p', 'hr', 'pre', 'blockquote', 'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'figure', 'figcaption', 'div', 'a', 'em', 'strong', 'small', 's', 'cite', 'q', 'dfn', 'abbr', 'time', 'code', 'var', 'samp', 'kbd', 'sub', 'sup', 'i', 'b', 'u', 'mark', 'ruby', 'rt', 'rp', 'bdi', 'bdo', 'span', 'br', 'wbr', 'ins', 'del', 'img', 'iframe', 'embed', 'object', 'param', 'video', 'audio', 'source', 'track', 'canvas', 'svg', 'math', 'table', 'caption', 'colgroup', 'col', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'form', 'fieldset', 'legend', 'label', 'input', 'button', 'select', 'datalist', 'optgroup', 'option', 'textarea', 'keygen', 'output', 'progress', 'meter', 'details', 'summary', 'menuitem', 'menu', 'defs', 'clipPath', 'path', 'g']);
 var $author$project$HtmlToElm$HtmlToElm$renderTagFunctionHead = function (tagName) {
 	return A2($elm$core$List$member, tagName, $author$project$HtmlToElm$ElmHtmlWhitelists$implementedTagFunctions) ? tagName : (A2($elm$core$List$member, tagName, $author$project$HtmlToElm$ElmHtmlWhitelists$reservedWords) ? (tagName + '_') : ('node \"' + (tagName + '\"')));
 };
