@@ -1,5 +1,5 @@
 var node = document.getElementById('main');
-var elm = Elm.Main.embed(node);
+var elm = Elm.HtmlToElmWebsite.Main.init({ node: node});
 
 var globalCurrElmCode = "";
 
